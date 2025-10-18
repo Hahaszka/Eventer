@@ -1,0 +1,11 @@
+fastapi[all]
+sqlalchemy
+alembic
+psycopg2-binary
+httpx
+asyncpg
+fastapi-users[sqlalchemy]
+fastapi-users[jwt]
+python-dotenv
+httpx-oauthcd
+sendgrid
