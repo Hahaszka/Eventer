@@ -10,7 +10,6 @@ from pydantic import Field, validator
 
 
 class UserRead(schemas.BaseUser[uuid.UUID]):
-    # ZMIANA: username może być teraz pusty
     username: Optional[str] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None
@@ -19,7 +18,6 @@ class UserRead(schemas.BaseUser[uuid.UUID]):
 
 
 class UserCreate(schemas.BaseUserCreate):
-    # Bez zmian - przy tradycyjnej rejestracji nadal wymagamy wszystkiego
     username: str = Field(
         ..., min_length=3, max_length=50, pattern=r"^[a-zA-Z0-9_]+$"
     )
@@ -30,7 +28,6 @@ class UserCreate(schemas.BaseUserCreate):
 
     @validator("password")
     def validate_password_strength(cls, value):
-        # ... (walidacja hasła bez zmian) ...
         if len(value) < 8:
             raise ValueError("Hasło musi mieć co najmniej 8 znaków.")
         if not re.search(r"[A-Z]", value):
@@ -43,7 +40,6 @@ class UserCreate(schemas.BaseUserCreate):
 
 
 class UserUpdate(schemas.BaseUserUpdate):
-    # ZMIANA: Pozwalamy użytkownikowi ustawić swój username
     username: Optional[str] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None
