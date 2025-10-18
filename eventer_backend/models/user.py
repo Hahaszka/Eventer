@@ -1,16 +1,14 @@
-# models/user.py
 
 import enum
 import uuid
-from typing import List  # <--- ZMIANA 1: Nowy import
+from typing import List
 
 from sqlalchemy import Boolean, Column, Date, String
 from sqlalchemy.dialects.postgresql import ENUM as PgEnum
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
-from sqlalchemy.orm import Mapped, relationship  # <--- ZMIANA 2: Nowy import
+from sqlalchemy.orm import Mapped, relationship
 
 from database.setup import Base
-# ZMIANA 3: Importujemy model OAuthAccount, aby móc się do niego odnieść
 from .oauth import OAuthAccount
 
 
@@ -45,8 +43,6 @@ class User(Base):
     )
     deleted: Mapped[bool] = Column(Boolean, default=False, nullable=False)
 
-    # --- ZMIANA 4: Dodajemy definicję relacji ---
-    # To tworzy atrybut `user.oauth_accounts` jako listę
     oauth_accounts: Mapped[List["OAuthAccount"]] = relationship(
         "OAuthAccount", lazy="subquery"
     )
