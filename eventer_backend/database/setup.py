@@ -5,7 +5,7 @@ from typing import AsyncGenerator
 
 from dotenv import load_dotenv
 from fastapi import Depends
-# ZMIANA 1: Usunięto niepotrzebny import
+
 from fastapi_users.db import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -16,7 +16,6 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 
 Base = declarative_base()
 
-# ZMIANA 2: Wciąż importujemy nasz model OAuthAccount
 from models.oauth import OAuthAccount
 
 print("--- 2. database/setup.py: Moduł zaimportowany ---")
@@ -41,5 +40,4 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 async def get_user_db(session: AsyncSession = Depends(get_async_session)):
     from models.user import User
 
-    # ZMIANA 3: Używamy standardowego SQLAlchemyUserDatabase,
     yield SQLAlchemyUserDatabase(session, User, OAuthAccount)
