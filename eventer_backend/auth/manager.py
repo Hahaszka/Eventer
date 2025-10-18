@@ -9,7 +9,6 @@ from fastapi import Depends, HTTPException, Request, status
 from fastapi_users import BaseUserManager, UUIDIDMixin, schemas
 from sqlalchemy import select
 
-# Importy SendGrid (zostawiamy je na przyszłość)
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
@@ -39,8 +38,6 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         print("--------------------------------------------------")
 
         # === SEKCJA SENDGRID (TYMCZASOWO WYŁĄCZONA) ===
-        # W przyszłości, gdy skonfigurujesz własną domenę zamiast Gmaila,
-        # możesz odkomentować ten blok, aby włączyć wysyłkę e-maili.
         #
         # print("Próba wysłania e-maila przez SendGrid...")
         # api_key = os.environ.get("SENDGRID_API_KEY")
