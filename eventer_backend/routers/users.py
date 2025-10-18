@@ -5,13 +5,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from auth.manager import UserManager, get_user_manager
 from models.user import User
 
-# Importujemy obiekt fastapi_users z main.py, aby uzyskać dostęp do zależności
 from main import fastapi_users
 from schemas.user import UserRead, UserUpdate
 
 router = APIRouter()
 
-# Dołączamy standardowy router do zarządzania danymi użytkownika (np. zmiana imienia)
 router.include_router(
     fastapi_users.get_users_router(UserRead, UserUpdate),
     prefix="",
@@ -34,6 +32,6 @@ async def delete_me(
         )
 
     user.deleted = True
-    user.is_active = False  # Dezaktywujemy użytkownika
+    user.is_active = False
     await user_manager.update(user, safe=True)
     return None
