@@ -12,7 +12,6 @@ from fastapi_users.authentication import (
 )
 from httpx_oauth.clients.google import GoogleOAuth2
 
-# WAŻNE: PRZENOSIMY TĘ CZĘŚĆ NA GÓRĘ, ABY UNIKNĄĆ CYKLICZNYCH IMPORTÓW
 from auth.manager import get_user_manager
 from models.user import User
 from schemas.user import UserCreate, UserRead, UserUpdate
