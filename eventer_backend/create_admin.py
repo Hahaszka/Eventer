@@ -4,7 +4,6 @@ from datetime import date
 
 from fastapi import HTTPException
 
-# Ważne: upewnij się, że te importy wskazują na poprawne pliki w Twoim projekcie
 from auth.manager import UserManager
 from database.setup import get_async_session, get_user_db
 from models.user import User
@@ -36,7 +35,6 @@ async def create_admin_user():
     user_manager = UserManager(user_db)
 
     try:
-        # Przygotowujemy dane użytkownika zgodnie ze schematem UserCreate
         user_create_schema = UserCreate(
             email=ADMIN_EMAIL,
             password=ADMIN_PASSWORD,
@@ -45,9 +43,7 @@ async def create_admin_user():
             last_name=ADMIN_LAST_NAME,
             date_of_birth=ADMIN_DATE_OF_BIRTH,
         )
-
-        # Tworzymy użytkownika, ustawiając flagę superużytkownika
-        # `safe=False` pozwala nam ustawić dodatkowe flagi, takie jak is_superuser
+        
         await user_manager.create(
             user_create_schema,
             safe=False,
@@ -59,7 +55,6 @@ async def create_admin_user():
         print(f"   Hasło: [UKRYTE]")
 
     except HTTPException as e:
-        # Obsługa błędu, jeśli użytkownik już istnieje
         if "już istnieje" in e.detail:
             print(f"⚠️  Błąd: Administrator z emailem '{ADMIN_EMAIL}' lub nazwą '{ADMIN_USERNAME}' już istnieje.")
             print("   Nie podjęto żadnych działań.")
