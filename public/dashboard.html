@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eventer - Dashboard</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
+    />
+
+    <style>
+      body {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .main-wrapper {
+        flex: 1;
+        display: flex;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .sidebar-panel {
+        width: 400px;
+        min-width: 400px;
+        background-color: #fff;
+        border-right: 1px solid #dee2e6;
+        display: flex;
+        flex-direction: column;
+        z-index: 2;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .sidebar-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #f0f0f0;
+        background: #fff;
+      }
+
+      .events-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        background-color: #f8f9fa;
+      }
+
+      .map-container {
+        flex: 1; 
+        position: relative;
+      }
+
+      #mainMap {
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+      }
+
+      .event-card {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid #e9ecef;
+      }
+      .event-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        border-color: #000;
+      }
+      .event-card.active {
+        border-color: #000;
+        background-color: #fff;
+        box-shadow: 0 0 0 1px #000 inset;
+      }
+
+      .fab-add {
+        position: absolute;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: #000;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        text-decoration: none;
+        transition: transform 0.2s;
+      }
+      .fab-add:hover {
+        transform: scale(1.1);
+        color: white;
+      }
+
+      @media (max-width: 768px) {
+        .main-wrapper {
+          flex-direction: column-reverse;
+        }
+        .sidebar-panel {
+          width: 100%;
+          height: 40%;
+          min-height: unset;
+        }
+        .map-container {
+          height: 60%;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <nav
+      class="navbar navbar-expand-lg navbar-light bg-white shadow-sm"
+      style="height: 60px; flex-shrink: 0; z-index: 10"
+    >
+      <div class="container-fluid px-3">
+        <a class="navbar-brand fw-bold tracking-wide" href="#">EVENTER</a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarContent"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+          <ul class="navbar-nav me-auto"></ul>
+          <div class="d-flex align-items-center gap-3">
+            <button
+              id="adminBtn"
+              class="btn btn-danger btn-sm d-none fw-bold shadow-sm"
+            >
+              <i class="fas fa-user-shield me-2"></i>ADMIN
+            </button>
+
+            <div class="dropdown">
+              <a
+                href="#"
+                class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark fw-bold"
+                id="userDropdown"
+                data-bs-toggle="dropdown"
+              >
+                <div
+                  class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                  style="width: 32px; height: 32px"
+                >
+                  <i class="fas fa-user small"></i>
+                </div>
+                <span id="navUsername" class="small">...</span>
+              </a>
+              <ul
+                class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-3 mt-2"
+              >
+                <li>
+                  <a class="dropdown-item py-2" href="/profile.html"
+                    >Mój Profil</a
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a
+                    class="dropdown-item py-2 text-danger fw-bold"
+                    href="#"
+                    id="logoutBtn"
+                    >Wyloguj</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="main-wrapper">
+      <div class="sidebar-panel">
+        <div class="sidebar-header">
+          <h5 class="fw-bold mb-3">Odkrywaj wydarzenia</h5>
+
+          <div class="input-group mb-3">
+            <span class="input-group-text bg-light border-end-0 border"
+              ><i class="fas fa-search text-muted"></i
+            ></span>
+            <input
+              id="searchInput"
+              class="form-control bg-light border-start-0 border"
+              type="search"
+              placeholder="Szukaj (np. RPG, Poznań)..."
+            />
+          </div>
+
+          <div class="d-flex gap-2">
+            <button
+              class="btn btn-sm btn-dark flex-grow-1 rounded-pill sort-btn active"
+              data-sort="date"
+            >
+              <i class="far fa-calendar-alt me-1"></i> Data
+            </button>
+            <button
+              class="btn btn-sm btn-outline-dark flex-grow-1 rounded-pill sort-btn"
+              data-sort="distance"
+              id="btnSortDistance"
+              disabled
+            >
+              <i class="fas fa-location-arrow me-1"></i> Odległość
+            </button>
+          </div>
+
+          <div
+            class="mt-3 d-flex justify-content-between align-items-center border-top pt-2"
+          >
+            <small class="text-muted"
+              >Znaleziono:
+              <span id="eventsCount" class="fw-bold text-dark">0</span></small
+            >
+          </div>
+        </div>
+
+        <div class="events-list" id="eventsListContainer">
+          <div class="text-center py-5">
+            <div
+              class="spinner-border spinner-border-sm text-secondary"
+              role="status"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-container">
+        <div id="mainMap"></div>
+
+        <a href="/add-event.html" class="fab-add" title="Dodaj wydarzenie">
+          <i class="fas fa-plus fa-lg"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="modal fade" id="eventViewModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow overflow-hidden">
+          <div
+            style="
+              height: 150px;
+              background: linear-gradient(135deg, #1a1e21, #454d55);
+              display: flex;
+              align-items: flex-end;
+              padding: 20px;
+            "
+          >
+            <h4 class="text-white fw-bold mb-0" id="viewEventTitle">...</h4>
+          </div>
+          <div class="modal-body p-4">
+            <div class="d-flex align-items-center mb-3 text-muted small">
+              <i class="far fa-calendar-alt me-2"></i>
+              <span id="viewEventDate" class="fw-bold text-dark">...</span>
+            </div>
+            <p id="viewEventDesc" class="text-secondary mb-4">...</p>
+            <hr />
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center">
+                <div
+                  class="bg-light rounded-circle d-flex justify-content-center align-items-center me-2"
+                  style="width: 32px; height: 32px"
+                >
+                  <i class="fas fa-user text-muted"></i>
+                </div>
+                <small class="text-muted"
+                  >Organizator:
+                  <span class="fw-bold" id="viewEventCreator">...</span></small
+                >
+              </div>
+              <button
+                type="button"
+                class="btn btn-dark rounded-pill px-4"
+                data-bs-dismiss="modal"
+              >
+                Zamknij
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="completeProfileModal"
+      data-bs-backdrop="static"
+      data-bs-keyboard="false"
+      tabindex="-1"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold">Wymagane dane</h5>
+          </div>
+          <div class="modal-body">
+            <form id="onboardingForm">
+              <div class="row mb-2">
+                <div class="col">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="inputFirstName"
+                    placeholder="Imię"
+                    required
+                  />
+                </div>
+                <div class="col">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="inputLastName"
+                    placeholder="Nazwisko"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="mb-2">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="inputUsername"
+                  placeholder="Username"
+                  required
+                />
+              </div>
+              <div class="row mb-3">
+                <div class="col">
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="inputDob"
+                    required
+                  />
+                </div>
+                <div class="col">
+                  <select class="form-select" id="inputGender" required>
+                    <option value="" disabled selected>Płeć</option>
+                    <option value="M">M</option>
+                    <option value="F">K</option>
+                  </select>
+                </div>
+              </div>
+              <button
+                type="submit"
+                class="btn btn-black w-100 rounded-pill fw-bold"
+              >
+                Zapisz
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="editEventModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold">Edytuj wydarzenie</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body p-4">
+            <form id="editEventForm">
+              <input type="hidden" id="editEventId" />
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-muted">TYTUŁ</label>
+                <input
+                  type="text"
+                  class="form-control bg-light border-0"
+                  id="editEventTitleInput"
+                  required
+                />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-muted"
+                  >DATA I GODZINA</label
+                >
+                <input
+                  type="datetime-local"
+                  class="form-control bg-light border-0"
+                  id="editEventDateInput"
+                  required
+                />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-muted">OPIS</label>
+                <textarea
+                  class="form-control bg-light border-0"
+                  id="editEventDescInput"
+                  rows="4"
+                  required
+                ></textarea>
+              </div>
+
+              <div class="d-flex justify-content-end gap-2 mt-4">
+                <button
+                  type="button"
+                  class="btn btn-link text-muted text-decoration-none"
+                  data-bs-dismiss="modal"
+                >
+                  Anuluj
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-dark rounded-pill fw-bold px-4"
+                >
+                  Zapisz zmiany
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script src="/js/dashboard.js"></script>
+  </body>
+</html>

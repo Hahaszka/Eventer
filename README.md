@@ -1,4 +1,1 @@
 # Eventer
-
-## Autor:
-### Kacper Michalski

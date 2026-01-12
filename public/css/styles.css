@@ -1,0 +1,90 @@
+/* Style ogólne */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f2f2f2;
+}
+
+.login-card {
+    max-width: 420px;
+    width: 100%;
+    border: none;
+    border-radius: 24px; /* Mocne zaokrąglenie w stylu nowoczesnych apek */
+}
+
+/* Typografia */
+h1 {
+    font-size: 1.75rem;
+    letter-spacing: 2px;
+}
+
+.form-label {
+    letter-spacing: 1px;
+    font-size: 0.75rem;
+}
+
+/* Pola formularza */
+.form-control {
+    border-radius: 12px;
+    padding: 12px 15px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    font-size: 1rem;
+}
+
+.form-control:focus {
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+    border-color: #000;
+}
+
+/* Czarny przycisk (Primary) */
+.btn-black {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-black:hover {
+    background-color: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Przycisk Google */
+.btn-google {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    color: #333;
+    transition: all 0.2s;
+}
+
+.btn-google:hover {
+    background-color: #f8f9fa;
+    border-color: #c1c9d0;
+}
+
+/* Animacja pojawiania się */
+.fade-in {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsywność */
+@media (max-width: 576px) {
+    .container {
+        padding: 0;
+    }
+    .login-card {
+        border-radius: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        box-shadow: none !important;
+    }
+}

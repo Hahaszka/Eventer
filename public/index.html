@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecting...</title>
+    <script>
+        const token = localStorage.getItem('eventer_token');
+        if (token) {
+            window.location.href = 'dashboard.html';
+        } else {
+            window.location.href = 'auth.html';
+        }
+    </script>
+</head>
+<body>
+</body>
+</html>

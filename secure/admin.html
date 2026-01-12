@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Eventer - Admin Panel</title>
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <style>
+      .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+      }
+      .action-btn {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <nav class="navbar navbar-dark bg-dark shadow-sm mb-4">
+      <div class="container-fluid px-4">
+        <span class="navbar-brand fw-bold tracking-wide">
+          <i class="fas fa-user-shield me-2 text-danger"></i>EVENTER
+          <span class="text-danger">ADMIN</span>
+        </span>
+        <div class="d-flex gap-2">
+          <button
+            class="btn btn-outline-light btn-sm"
+            onclick="location.reload()"
+          >
+            <i class="fas fa-sync-alt"></i> Odśwież
+          </button>
+          <a href="/dashboard.html" class="btn btn-light btn-sm fw-bold">
+            <i class="fas fa-arrow-left me-2"></i>Wyjdź
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid px-4">
+      <div id="adminContent">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h4 class="fw-bold m-0">Zarządzanie Użytkownikami</h4>
+          <button
+            class="btn btn-dark rounded-pill"
+            data-bs-toggle="modal"
+            data-bs-target="#createUserModal"
+          >
+            <i class="fas fa-plus me-2"></i>Dodaj użytkownika
+          </button>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="usersTable">
+              <thead class="bg-light">
+                <tr>
+                  <th class="ps-4">Email / ID</th>
+                  <th>Imię i Nazwisko</th>
+                  <th>Username</th>
+                  <th>Role i Status</th>
+                  <th class="text-end pe-4">Akcje</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="createUserModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content rounded-4 border-0">
+          <div class="modal-header border-0">
+            <h5 class="modal-title fw-bold">Nowy Użytkownik</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="createForm">
+              <div class="mb-2">
+                <input
+                  type="email"
+                  class="form-control"
+                  name="email"
+                  placeholder="Email"
+                  required
+                />
+              </div>
+              <div class="mb-2">
+                <input
+                  type="password"
+                  class="form-control"
+                  name="password"
+                  placeholder="Hasło"
+                  required
+                />
+              </div>
+              <div class="mb-2">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="username"
+                  placeholder="Username"
+                  required
+                />
+              </div>
+              <div class="row g-2 mb-2">
+                <div class="col">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="first_name"
+                    placeholder="Imię"
+                    required
+                  />
+                </div>
+                <div class="col">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="last_name"
+                    placeholder="Nazwisko"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="mb-3">
+                <input
+                  type="date"
+                  class="form-control"
+                  name="date_of_birth"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                class="btn btn-dark w-100 rounded-pill fw-bold"
+              >
+                Stwórz
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="editUserModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content rounded-4 border-0">
+          <div class="modal-header border-0">
+            <h5 class="modal-title fw-bold">Edycja Użytkownika</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editForm">
+              <input type="hidden" id="editUserId" />
+
+              <div class="mb-3">
+                <label class="small text-muted fw-bold">DANE PODSTAWOWE</label>
+                <input
+                  type="text"
+                  class="form-control mb-2"
+                  id="editFirstName"
+                  placeholder="Imię"
+                />
+                <input
+                  type="text"
+                  class="form-control mb-2"
+                  id="editLastName"
+                  placeholder="Nazwisko"
+                />
+                <input
+                  type="text"
+                  class="form-control"
+                  id="editUsername"
+                  placeholder="Username"
+                />
+              </div>
+
+              <div class="mb-3">
+                <label class="small text-muted fw-bold">UPRAWNIENIA</label>
+                <div class="form-check form-switch">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="editIsActive"
+                  />
+                  <label class="form-check-label" for="editIsActive"
+                    >Konto Aktywne</label
+                  >
+                </div>
+                <div class="form-check form-switch">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="editIsSuperuser"
+                  />
+                  <label class="form-check-label" for="editIsSuperuser"
+                    >Administrator (Superuser)</label
+                  >
+                </div>
+                <div class="form-check form-switch">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="editIsVerified"
+                  />
+                  <label class="form-check-label" for="editIsVerified"
+                    >Email zweryfikowany</label
+                  >
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                class="btn btn-dark w-100 rounded-pill fw-bold"
+              >
+                Zapisz zmiany
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div
+      id="globalLoader"
+      class="d-none position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+      style="
+        background: rgba(255, 255, 255, 0.8);
+        z-index: 9999;
+        backdrop-filter: blur(2px);
+      "
+    >
+      <div
+        class="spinner-border text-danger"
+        style="width: 3rem; height: 3rem"
+        role="status"
+      >
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="/js/loader.js"></script>
+
+    <script src="/admin/js/admin.js"></script>
+  </body>
+</html>
