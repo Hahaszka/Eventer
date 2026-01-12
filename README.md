@@ -1,5 +1,4 @@
 # Eventer
 
-## Autorzy:
-### Kacper Michalski,
-### Mateusz Łagocki
+## Autor:
+### Kacper Michalski
