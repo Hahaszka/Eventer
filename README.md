@@ -1,1 +1,2 @@
 # Eventer
+## Author: Kacper Michalski
