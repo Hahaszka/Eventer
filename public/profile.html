@@ -62,9 +62,6 @@
             <li class="nav-item">
               <a class="nav-link" href="/dashboard.html">Dashboard</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Wydarzenia</a>
-            </li>
           </ul>
           <div class="d-flex align-items-center gap-3">
             <a
@@ -103,7 +100,7 @@
                 class="d-flex gap-2 justify-content-center justify-content-lg-start mb-4"
               >
                 <button
-                  class="btn btn-dark rounded-pill px-4 fw-bold"
+                  class="btn btn-dark rounded-pill px-4 fw-bold d-none"
                   id="editProfileBtn"
                 >
                   <i class="fas fa-pen me-2"></i>Edytuj profil
@@ -159,7 +156,7 @@
                 <small
                   class="text-muted text-uppercase"
                   style="font-size: 0.7rem"
-                  >Twoje Wydarzenia</small
+                  >Wydarzenia</small
                 >
               </div>
             </div>
@@ -189,7 +186,7 @@
             </div>
           </div>
 
-          <h5 class="fw-bold mb-3">Twoje wydarzenia</h5>
+          <h5 class="fw-bold mb-3">Wydarzenia użytkownika</h5>
 
           <div id="eventsContainer">
             <div class="text-center py-5">
@@ -198,122 +195,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="modal fade" id="profileModal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4 shadow">
-          <div
-            class="profile-cover-full"
-            style="height: 120px; border-radius: 1rem 1rem 0 0"
-          ></div>
-
-          <div class="modal-body pt-0 px-4 pb-4">
-            <div class="text-center mb-3">
-              <img
-                src=""
-                alt="Avatar"
-                class="rounded-circle bg-white"
-                style="
-                  width: 100px;
-                  height: 100px;
-                  object-fit: cover;
-                  border: 4px solid white;
-                  margin-top: -50px;
-                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                "
-                id="modalAvatar"
-              />
-            </div>
-
-            <form id="editProfileForm">
-              <div
-                id="profileAlert"
-                class="alert alert-danger d-none small"
-              ></div>
-
-              <div class="row g-3 mb-3">
-                <div class="col-6">
-                  <label class="form-label small fw-bold text-muted"
-                    >IMIĘ</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control bg-light border-0"
-                    id="editFirstName"
-                    required
-                  />
-                </div>
-                <div class="col-6">
-                  <label class="form-label small fw-bold text-muted"
-                    >NAZWISKO</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control bg-light border-0"
-                    id="editLastName"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label small fw-bold text-muted"
-                  >NAZWA UŻYTKOWNIKA</label
-                >
-                <input
-                  type="text"
-                  class="form-control bg-light border-0"
-                  id="editUsername"
-                  required
-                />
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label small fw-bold text-muted">BIO</label>
-                <textarea
-                  class="form-control bg-light border-0"
-                  id="editBio"
-                  rows="3"
-                  placeholder="Napisz kilka słów o sobie..."
-                ></textarea>
-              </div>
-
-              <div class="d-flex justify-content-end mt-4">
-                <button
-                  type="button"
-                  class="btn btn-link text-muted text-decoration-none me-2"
-                  data-bs-dismiss="modal"
-                >
-                  Anuluj
-                </button>
-                <button
-                  type="submit"
-                  class="btn btn-dark rounded-pill fw-bold px-4"
-                >
-                  Zapisz zmiany
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div
-      id="globalLoader"
-      class="d-none position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-      style="
-        background: rgba(255, 255, 255, 0.8);
-        z-index: 9999;
-        backdrop-filter: blur(2px);
-      "
-    >
-      <div
-        class="spinner-border text-dark"
-        style="width: 3rem; height: 3rem"
-        role="status"
-      ></div>
     </div>
 
     <div class="modal fade" id="profileModal" tabindex="-1">
@@ -430,6 +311,7 @@
           <div class="modal-body p-4">
             <form id="editEventForm">
               <input type="hidden" id="editEventId" />
+
               <div class="mb-3">
                 <label class="form-label small fw-bold text-muted">TYTUŁ</label>
                 <input
@@ -450,6 +332,23 @@
                   id="editEventDateInput"
                   required
                 />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-muted"
+                  >KATEGORIA</label
+                >
+                <select
+                  class="form-control bg-light border-0"
+                  id="editEventCategoryInput"
+                  required
+                >
+                  <option value="SPORT">Sport</option>
+                  <option value="PARTY">Impreza</option>
+                  <option value="LEARNING">Nauka</option>
+                  <option value="CULTURE">Kultura</option>
+                  <option value="OTHER">Inne</option>
+                </select>
               </div>
 
               <div class="mb-3">
@@ -482,10 +381,11 @@
         </div>
       </div>
     </div>
-    
+
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/loader.js"></script>
+    <script src="/js/utils.js"></script>
     <script src="/js/profile.js"></script>
   </body>
 </html>

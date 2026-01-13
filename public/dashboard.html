@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Eventer - Dashboard</title>
+
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -18,7 +19,6 @@
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin=""
     />
-    <link rel="stylesheet" href="/css/styles.css" />
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"
@@ -27,6 +27,7 @@
       rel="stylesheet"
       href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
     />
+    <link rel="stylesheet" href="/css/styles.css" />
 
     <style>
       body {
@@ -68,7 +69,7 @@
       }
 
       .map-container {
-        flex: 1; 
+        flex: 1;
         position: relative;
       }
 
@@ -92,6 +93,12 @@
         border-color: #000;
         background-color: #fff;
         box-shadow: 0 0 0 1px #000 inset;
+      }
+
+      /* Custom Marker Styles */
+      .custom-map-marker {
+        background: transparent;
+        border: none;
       }
 
       .fab-add {
@@ -202,6 +209,19 @@
         <div class="sidebar-header">
           <h5 class="fw-bold mb-3">Odkrywaj wydarzenia</h5>
 
+          <select
+            id="categoryFilter"
+            class="form-select bg-light border-0 mb-3 text-muted fw-bold"
+            style="cursor: pointer"
+          >
+            <option value="" selected>Wszystkie kategorie</option>
+            <option value="SPORT">⚽ Sport</option>
+            <option value="PARTY">🎉 Impreza</option>
+            <option value="NAUKA">📚 Nauka</option>
+            <option value="KULTURA">🎭 Kultura</option>
+            <option value="INNE">📍 Inne</option>
+          </select>
+
           <div class="input-group mb-3">
             <span class="input-group-text bg-light border-end-0 border"
               ><i class="fas fa-search text-muted"></i
@@ -211,6 +231,7 @@
               class="form-control bg-light border-start-0 border"
               type="search"
               placeholder="Szukaj (np. RPG, Poznań)..."
+              autocomplete="off"
             />
           </div>
 
@@ -416,6 +437,23 @@
               </div>
 
               <div class="mb-3">
+                <label class="form-label small fw-bold text-muted"
+                  >KATEGORIA</label
+                >
+                <select
+                  class="form-control bg-light border-0"
+                  id="editEventCategoryInput"
+                  required
+                >
+                  <option value="SPORT">Sport</option>
+                  <option value="PARTY">Impreza</option>
+                  <option value="LEARNING">Nauka</option>
+                  <option value="CULTURE">Kultura</option>
+                  <option value="OTHER">Inne</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
                 <label class="form-label small fw-bold text-muted">OPIS</label>
                 <textarea
                   class="form-control bg-light border-0"
@@ -445,14 +483,19 @@
         </div>
       </div>
     </div>
+
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="/js/utils.js"></script>
+
     <script
       src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
       crossorigin=""
     ></script>
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+
     <script src="/js/dashboard.js"></script>
   </body>
 </html>

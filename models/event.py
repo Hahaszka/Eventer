@@ -1,9 +1,18 @@
 import uuid
+import enum
 from datetime import datetime
 from sqlalchemy import Column, String, Float, DateTime, ForeignKey, Text, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from database.setup import Base
+
+# Definicja Kategorii
+class EventCategory(str, enum.Enum):
+    SPORT = "SPORT"
+    PARTY = "PARTY"
+    LEARNING = "NAUKA"
+    CULTURE = "KULTURA"
+    OTHER = "INNE"
 
 class Event(Base):
     __tablename__ = "events"
@@ -11,6 +20,8 @@ class Event(Base):
     id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String(100), nullable=False)
     description = Column(Text, nullable=True)
+    
+    category = Column(String, default=EventCategory.OTHER.value, nullable=False)
     
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)

@@ -1,32 +1,34 @@
-import uuid
-from datetime import datetime
 from typing import Optional
+from datetime import datetime
+import uuid
 from pydantic import BaseModel
-from schemas.user import UserRead
+from models.event import EventCategory
+from schemas.user import UserReadPublic
 
-class EventCreate(BaseModel):
+class EventBase(BaseModel):
     title: str
     description: Optional[str] = None
+    event_date: datetime
+    category: EventCategory = EventCategory.OTHER
     latitude: float
     longitude: float
-    event_date: datetime
+
+class EventCreate(EventBase):
+    pass
 
 class EventUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     event_date: Optional[datetime] = None
+    category: Optional[EventCategory] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
-class EventRead(BaseModel):
+class EventRead(EventBase):
     id: uuid.UUID
-    title: str
-    description: Optional[str]
-    latitude: float
-    longitude: float
-    event_date: datetime
     created_at: datetime
     creator_id: uuid.UUID
-    is_deleted: bool
-    creator: Optional[UserRead] 
-    
+    creator: Optional[UserReadPublic]
+
     class Config:
         from_attributes = True

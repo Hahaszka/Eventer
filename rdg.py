@@ -6,11 +6,11 @@ from sqlalchemy import select
 
 from database.setup import async_session_maker
 from models.user import User
-from models.event import Event
+from models.event import Event, EventCategory
 from models.oauth import OAuthAccount 
 
 # === KONFIGURACJA ===
-ILOSC_WYDARZEN = 50
+ILOSC_WYDARZEN = 300
 
 # Granice Wielkopolski
 LAT_MIN = 51.45
@@ -18,10 +18,22 @@ LAT_MAX = 53.60
 LNG_MIN = 15.75
 LNG_MAX = 19.10
 
+TOPICS_MAP = {
+    "Granie w RPG": EventCategory.CULTURE,
+    "Ognisko": EventCategory.PARTY,
+    "Warsztaty Jogi": EventCategory.SPORT,
+    "Kodowanie w Pythonie": EventCategory.LEARNING,
+    "Zawody Pływackie": EventCategory.SPORT,
+    "Spotkanie D&D": EventCategory.CULTURE,
+    "Degustacja Pizzy": EventCategory.PARTY,
+    "Targi Staroci": EventCategory.OTHER,
+    "Karaoke": EventCategory.PARTY,
+    "Bieganie po lesie": EventCategory.SPORT,
+    "Wystawa Sztuki": EventCategory.CULTURE,
+    "Kurs Tańca": EventCategory.LEARNING
+}
+
 PREFIXES = ["Nocne", "Wielkie", "Sąsiedzkie", "Otwarte", "Charytatywne", "Turniejowe"]
-TOPICS = ["Granie w RPG", "Ognisko", "Warsztaty Jogi", "Kodowanie w Pythonie", 
-          "Zawody Pływackie", "Spotkanie D&D", "Degustacja Pizzy", "Targi Staroci", 
-          "Karaoke", "Bieganie po lesie"]
 CITIES = ["Poznań", "Kalisz", "Konin", "Leszno", "Piła", "Gniezno", "Ostrów Wlkp."]
 
 DESCRIPTIONS = [
@@ -53,17 +65,22 @@ async def main():
         
         if not user:
             print("!!! BŁĄD: W bazie nie ma żadnego użytkownika !!!")
-            print("Zarejestruj najpierw konto przez stronę, żebyśmy mieli kogo wpisać jako twórcę.")
+            print("Zarejestruj najpierw konto przez stronę.")
             return
 
         print(f"Znaleziono użytkownika: {user.email} (ID: {user.id})")
         print(f"Tworzę {ILOSC_WYDARZEN} wydarzeń...")
 
         events_list = []
+        topic_keys = list(TOPICS_MAP.keys())
+
         for i in range(ILOSC_WYDARZEN):
             lat, lng = random_coords()
             
-            title = f"{random.choice(PREFIXES)} {random.choice(TOPICS)}"
+            chosen_topic = random.choice(topic_keys)
+            category = TOPICS_MAP[chosen_topic]
+            
+            title = f"{random.choice(PREFIXES)} {chosen_topic}"
             if random.random() > 0.7:
                 title += f" - {random.choice(CITIES)}"
             
@@ -72,6 +89,7 @@ async def main():
             new_event = Event(
                 title=title,
                 description=random.choice(DESCRIPTIONS),
+                category=category.value,
                 event_date=event_date,
                 latitude=lat,
                 longitude=lng,
@@ -83,9 +101,7 @@ async def main():
         session.add_all(events_list)
         await session.commit()
         
-        print("--- SUKCES! DODANO WYDARZENIA ---")
-        print(f"Lokalizacja: Wielkopolska")
-        print(f"Zakres dat: 2026-2027")
+        print("--- SUKCES! DODANO WYDARZENIA Z KATEGORIAMI ---")
 
 if __name__ == "__main__":
     asyncio.run(main())

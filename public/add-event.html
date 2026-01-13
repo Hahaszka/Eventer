@@ -94,6 +94,22 @@
 
                 <div class="mb-3">
                   <label class="form-label small fw-bold text-muted"
+                    >KATEGORIA</label
+                  >
+                  <select class="form-select" name="category" required>
+                    <option value="" disabled selected>
+                      Wybierz kategorię...
+                    </option>
+                    <option value="SPORT">⚽ Sport</option>
+                    <option value="PARTY">🎉 Impreza</option>
+                    <option value="LEARNING">📚 Nauka</option>
+                    <option value="CULTURE">🎭 Kultura</option>
+                    <option value="OTHER">📍 Inne</option>
+                  </select>
+                </div>
+                
+                <div class="mb-3">
+                  <label class="form-label small fw-bold text-muted"
                     >OPIS</label
                   >
                   <textarea
@@ -166,5 +182,6 @@
 
     <script src="/js/loader.js"></script>
     <script src="/js/add-event.js"></script>
+    <script src="/js/utils.js"></script>
   </body>
 </html>

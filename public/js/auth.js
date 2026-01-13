@@ -109,9 +109,19 @@ $(document).ready(function () {
       },
       error: function (xhr) {
         let msg = "Wystąpił błąd rejestracji.";
+
         if (xhr.responseJSON && xhr.responseJSON.detail) {
-          msg = xhr.responseJSON.detail;
+          const detail = xhr.responseJSON.detail;
+
+          if (Array.isArray(detail)) {
+            msg = detail[0].msg;
+
+            msg = msg.replace("Value error, ", "");
+          } else {
+            msg = detail;
+          }
         }
+
         showError(msg);
       },
       complete: function () {

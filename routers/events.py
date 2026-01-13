@@ -2,11 +2,11 @@ from typing import List, Optional
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, desc, and_
+from sqlalchemy import select, desc, and_, or_
 from sqlalchemy.orm import selectinload
 
 from database.setup import get_async_session
-from models.event import Event
+from models.event import Event, EventCategory
 from models.user import User
 from schemas.event import EventCreate, EventRead, EventUpdate
 from auth.config import fastapi_users
@@ -17,6 +17,8 @@ current_user = fastapi_users.current_user(active=True)
 # 1. READ ALL
 @router.get("/", response_model=List[EventRead])
 async def get_events(
+    search: Optional[str] = Query(None),
+    category: Optional[EventCategory] = Query(None),
     min_lat: Optional[float] = Query(None),
     max_lat: Optional[float] = Query(None),
     min_lng: Optional[float] = Query(None),
@@ -26,6 +28,17 @@ async def get_events(
     user: User = Depends(current_user) 
 ):
     query = select(Event).options(selectinload(Event.creator)).where(Event.is_deleted == False)
+
+    if category:
+        query = query.where(Event.category == category.value)
+
+    if search:
+        query = query.where(
+            or_(
+                Event.title.ilike(f"%{search}%"),
+                Event.description.ilike(f"%{search}%")
+            )
+        )
 
     if min_lat is not None and max_lat is not None and min_lng is not None and max_lng is not None:
         query = query.where(
@@ -56,8 +69,7 @@ async def get_my_events(
     result = await session.execute(query)
     return result.scalars().all()
 
-
-# 3. READ ONE
+# 3. POJEDYNCZE WYDARZENIE
 @router.get("/{event_id}", response_model=EventRead)
 async def get_event(
     event_id: uuid.UUID,
@@ -73,6 +85,7 @@ async def get_event(
     
     return event
 
+# 4. WYDARZENIA KONKRETNEGO UŻYTKOWNIKA
 @router.get("/user/{user_id}", response_model=List[EventRead])
 async def get_user_events(
     user_id: uuid.UUID,
@@ -86,8 +99,7 @@ async def get_user_events(
     result = await session.execute(query)
     return result.scalars().all()
 
-
-# 4. CREATE
+# 5. TWORZENIE WYDARZENIA
 @router.post("/", response_model=EventRead)
 async def create_event(
     event_in: EventCreate,
@@ -102,13 +114,11 @@ async def create_event(
     session.add(new_event)
     await session.commit()
     await session.refresh(new_event)
-    
+
     new_event.creator = user
-    
     return new_event
 
-
-# 5. UPDATE
+# 6. AKTUALIZACJA
 @router.patch("/{event_id}", response_model=EventRead)
 async def update_event(
     event_id: uuid.UUID,
@@ -135,8 +145,7 @@ async def update_event(
     await session.refresh(event)
     return event
 
-
-# 6. DELETE
+# 7. USUWANIE
 @router.delete("/{event_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_event(
     event_id: uuid.UUID,

@@ -27,12 +27,12 @@ class UserReadPublic(schemas.BaseUser[uuid.UUID]):
         from_attributes = True
 
 class UserCreate(schemas.BaseUserCreate):
-    username: str = Field(
-        ..., min_length=3, max_length=50, pattern=r"^[a-zA-Z0-9_]+$"
+    username: Optional[str] = Field(
+        None, min_length=3, max_length=50, pattern=r"^[a-zA-Z0-9_]+$"
     )
-    first_name: str
-    last_name: str
-    date_of_birth: date
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    date_of_birth: Optional[date] = None
     gender: Optional[str] = None
 
     @validator("password")
