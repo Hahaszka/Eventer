@@ -1,5 +1,4 @@
 $(document).ready(function () {
-  // --- ZMIENNE GLOBALNE ---
   const onboardingModal = new bootstrap.Modal(document.getElementById("completeProfileModal"), { backdrop: "static", keyboard: false });
   const eventViewModal = new bootstrap.Modal(document.getElementById("eventViewModal"));
   const editEventModal = new bootstrap.Modal(document.getElementById("editEventModal"));
@@ -11,7 +10,6 @@ $(document).ready(function () {
   let searchTimeout = null;  // Debounce do wyszukiwania
   let currentUser = null;    // Zalogowany użytkownik
 
-  // --- 1. START: SESJA I INICJALIZACJA ---
   function checkSession() {
     const token = localStorage.getItem("eventer_token");
 
@@ -53,10 +51,8 @@ $(document).ready(function () {
     initSorting();
   }
 
-  // --- 2. MAPA I POBIERANIE DANYCH ---
   function initMap() {
 
-      // Wyłączamy domyślny zoomControl, żeby dodać go w prawym górnym rogu
       map = L.map('mainMap', { zoomControl: false }).setView([52.0693, 19.4803], 6);
       
       L.control.zoom({ position: 'topright' }).addTo(map);
@@ -150,8 +146,6 @@ $(document).ready(function () {
       if(userLocation) updateDistancesOnCards();
   }
 
-  // --- 3. TWORZENIE ELEMENTÓW ---
-
   function createMarker(event) {
       const dateStr = formatDate(event.event_date);
       const marker = L.marker([event.latitude, event.longitude]);
@@ -216,7 +210,6 @@ $(document).ready(function () {
       return $card;
   }
 
-  // --- 4. SORTOWANIE I DYSTANS ---
 
   function calculateDistance(lat1, lon1, lat2, lon2) {
       const R = 6371; // Promień Ziemi (km)
@@ -262,7 +255,6 @@ $(document).ready(function () {
       });
   }
 
-  // --- 5. WYSZUKIWARKA ---
   function initSearch() {
       $('#searchInput').on('input', function() {
           clearTimeout(searchTimeout);
@@ -289,7 +281,6 @@ $(document).ready(function () {
       });
   }
 
-  // --- 6. MODAL SZCZEGÓŁÓW ---
   $('body').on('click', '.view-event-btn, .view-details-btn', function(e) {
       e.stopPropagation(); 
       const eventId = $(this).data('id');
@@ -386,7 +377,6 @@ $(document).ready(function () {
       });
   });
 
-  // --- 7. OBSŁUGA POZOSTAŁYCH FORMULARZY ---
   $("#onboardingForm").submit(function (e) {
     e.preventDefault();
     const updateData = {
@@ -405,7 +395,7 @@ $(document).ready(function () {
       headers: token ? { Authorization: "Bearer " + token } : {},
       data: JSON.stringify(updateData),
       success: function (updatedUser) {
-        currentUser = updatedUser; // Update global
+        currentUser = updatedUser;
         onboardingModal.hide();
         initDashboard(updatedUser);
       },

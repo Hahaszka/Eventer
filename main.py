@@ -63,12 +63,10 @@ current_superuser = fastapi_users.current_user(active=True, superuser=True)
 async def admin_panel(user=Depends(current_superuser)):
     return FileResponse("secure/admin.html")
 
-# Chroniony plik JS dla admina
 @app.get("/admin/js/admin.js")
 async def get_admin_js(user=Depends(current_superuser)):
     return FileResponse("secure/js/admin.js", media_type="application/javascript")
 
-# Favicon
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     return FileResponse("public/img/logo.png")

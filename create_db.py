@@ -36,7 +36,6 @@ class GenderEnum(str, enum.Enum):
 
 
 # --- 3. DEFINICJE MODELI ---
-
 class OAuthAccount(SQLAlchemyBaseOAuthAccountTableUUID, Base):
     """
     Tabela: public.oauth_accounts

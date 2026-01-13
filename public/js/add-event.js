@@ -7,11 +7,10 @@ $(document).ready(function() {
     $.ajax({
         url: '/users/me',
         method: 'GET',
-        xhrFields: { withCredentials: true }, // Ważne dla Ciasteczek (Google Auth)
+        xhrFields: { withCredentials: true }, 
         headers: headers,
         success: function(user) {
             console.log("Sesja potwierdzona:", user.email);
-            // Dopiero teraz uruchamiamy resztę skryptu
             initPage(token);
         },
         error: function(xhr) {
@@ -20,11 +19,8 @@ $(document).ready(function() {
         }
     });
 
-    // 2. GŁÓWNA FUNKCJA STRONY (Uruchamiana tylko po weryfikacji)
     function initPage(authToken) {
         
-        // --- KONFIGURACJA MAPY (LEAFLET) ---
-        // Ustawiamy widok domyślny na Polskę
         const map = L.map('mapPicker').setView([52.0693, 19.4803], 6);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -45,7 +41,6 @@ $(document).ready(function() {
 
         let currentMarker = null;
 
-        // --- OBSŁUGA KLIKNIĘCIA W MAPĘ ---
         map.on('click', function(e) {
             const lat = e.latlng.lat;
             const lng = e.latlng.lng;
@@ -56,18 +51,15 @@ $(document).ready(function() {
 
             currentMarker = L.marker([lat, lng]).addTo(map);
 
-            // Uzupełniamy inputy
             $('#latInput').val(lat);
             $('#lngInput').val(lng);
 
-            // UI Feedback
             $('#locationStatus').removeClass('alert-info').addClass('alert-success')
                 .html('<i class="fas fa-check-circle me-2"></i> Lokalizacja wybrana.');
             
             $('#submitBtn').prop('disabled', false);
         });
 
-        // --- WYSYŁKA FORMULARZA ---
         $('#addEventForm').submit(function(e) {
             e.preventDefault();
 

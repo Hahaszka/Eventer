@@ -17,13 +17,11 @@ $(document).ready(function () {
   const $alertBox = $("#alertBox");
   const $successBox = $("#successBox");
 
-  // === 1. PRZEŁĄCZANIE WIDOKÓW ===
   $toggleBtn.click(function (e) {
     e.preventDefault();
     clearAlerts();
 
     if (isLoginView) {
-      // Przełącz na Rejestrację
       $loginForm.addClass("d-none");
       $registerForm.removeClass("d-none").addClass("fade-in");
 
@@ -31,7 +29,6 @@ $(document).ready(function () {
       $toggleText.text("Masz już konto?");
       $(this).text("Zaloguj się");
     } else {
-      // Przełącz na Logowanie
       $registerForm.addClass("d-none");
       $loginForm.removeClass("d-none").addClass("fade-in");
 
@@ -42,7 +39,6 @@ $(document).ready(function () {
     isLoginView = !isLoginView;
   });
 
-  // === 2. OBSŁUGA LOGOWANIA ===
   $loginForm.submit(function (e) {
     e.preventDefault();
     clearAlerts();
@@ -67,7 +63,6 @@ $(document).ready(function () {
     });
   });
 
-  // === 3. OBSŁUGA REJESTRACJI ===
   $registerForm.submit(function (e) {
     e.preventDefault();
     clearAlerts();
@@ -125,7 +120,6 @@ $(document).ready(function () {
     });
   });
 
-  // === 4. GOOGLE AUTH ===
   $("#googleBtn").click(function (e) {
     e.preventDefault();
     $.ajax({

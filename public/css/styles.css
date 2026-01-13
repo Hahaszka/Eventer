@@ -8,7 +8,7 @@ body {
     max-width: 420px;
     width: 100%;
     border: none;
-    border-radius: 24px; /* Mocne zaokrąglenie w stylu nowoczesnych apek */
+    border-radius: 24px;
 }
 
 /* Typografia */
@@ -37,7 +37,7 @@ h1 {
     border-color: #000;
 }
 
-/* Czarny przycisk (Primary) */
+/* Czarny przycisk */
 .btn-black {
     background-color: #000;
     color: #fff;
@@ -64,7 +64,6 @@ h1 {
     border-color: #c1c9d0;
 }
 
-/* Animacja pojawiania się */
 .fade-in {
     animation: fadeIn 0.4s ease-in-out;
 }
@@ -74,7 +73,6 @@ h1 {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Responsywność */
 @media (max-width: 576px) {
     .container {
         padding: 0;

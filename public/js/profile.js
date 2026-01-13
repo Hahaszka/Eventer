@@ -4,9 +4,7 @@ $(document).ready(function() {
     const profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
     const editEventModal = new bootstrap.Modal(document.getElementById('editEventModal'));
 
-    // --- 1. GŁÓWNA FUNKCJA ŁADOWANIA ---
     function initProfile() {
-        // Najpierw pobieramy dane ZALOGOWANEGO użytkownika
         $.ajax({
             url: '/users/me',
             method: 'GET',
@@ -14,11 +12,9 @@ $(document).ready(function() {
             headers: token ? { "Authorization": "Bearer " + token } : {},
             
             success: function(me) {
-                // Sprawdzamy kogo mamy wyświetlić na podstawie URL ?id=XYZ
                 const urlParams = new URLSearchParams(window.location.search);
                 const targetId = urlParams.get('id');
 
-                // WARUNEK: Jestem u siebie, jeśli nie ma ID w URL LUB ID w URL to moje ID
                 const isMyProfile = !targetId || targetId === me.id;
 
                 if (isMyProfile) {
@@ -38,14 +34,13 @@ $(document).ready(function() {
         });
     }
 
-    // --- 2. Pobieranie profilu publicznego (Obcego) ---
     function fetchPublicProfile(userId) {
         $.ajax({
             url: `/users/public/${userId}`,
             method: 'GET',
             headers: token ? { "Authorization": "Bearer " + token } : {},
             success: function(publicUser) {
-                renderProfileData(publicUser, false); // false = to nie ja
+                renderProfileData(publicUser, false);
             },
             error: function() {
                 $('#profilePageName').text("Nie znaleziono użytkownika");
@@ -54,9 +49,7 @@ $(document).ready(function() {
         });
     }
 
-    // --- 3. Renderowanie Danych (Wspólne dla obu przypadków) ---
     function renderProfileData(user, isOwner) {
-        // Teksty
         $('#profilePageName').text(`${user.first_name} ${user.last_name}`);
         $('#profilePageUsername').text(user.username);
         $('#profilePageDob').text(user.date_of_birth || 'Brak daty');
@@ -72,7 +65,6 @@ $(document).ready(function() {
         const avatarUrl = `https://ui-avatars.com/api/?name=${user.first_name}+${user.last_name}&background=343a40&color=fff&size=256`;
         $('#profilePageAvatar').attr('src', avatarUrl);
 
-        // UI: Przyciski Edycji Profilu
         if (isOwner) {
             $('#editProfileBtn').removeClass('d-none').data('user', user);
             document.title = "Twój Profil - Eventer";
@@ -81,11 +73,9 @@ $(document).ready(function() {
             document.title = `${user.first_name} ${user.last_name} - Eventer`;
         }
 
-        // Ładujemy eventy
         loadUserEvents(user.id, isOwner);
     }
 
-    // --- 4. Ładowanie wydarzeń ---
     function loadUserEvents(userId, isOwner) {
         const $container = $('#eventsContainer');
         const endpoint = isOwner ? '/events/me' : `/events/user/${userId}`;
@@ -118,10 +108,8 @@ $(document).ready(function() {
                     });
                     const imgUrl = `https://picsum.photos/seed/${event.id}/800/300`;
 
-                    // Przycisk edycji i usuwania TYLKO jeśli isOwner = true
                     let buttonsHtml = '';
                     if (isOwner) {
-                        // Kodujemy obiekt event do atrybutu, żeby go użyć przy edycji
                         const eventData = encodeURIComponent(JSON.stringify(event));
 
                         buttonsHtml = `
@@ -157,9 +145,6 @@ $(document).ready(function() {
         });
     }
 
-    // --- 5. Akcje Edycji (Tylko Owner) ---
-    
-    // Edycja PROFILU
     $('#editProfileBtn').click(function() {
         const user = $(this).data('user');
         $('#editFirstName').val(user.first_name);
@@ -187,13 +172,12 @@ $(document).ready(function() {
             data: JSON.stringify(updateData),
             success: function() { 
                 profileModal.hide(); 
-                initProfile(); // Przeładuj całość
+                initProfile();
             },
             error: function(xhr) { $("#profileAlert").text("Błąd zapisu.").removeClass("d-none"); }
         });
     });
 
-    // Edycja WYDARZENIA (Otwarcie modala)
     $(document).on('click', '.edit-event-btn', function() {
         const eventData = JSON.parse(decodeURIComponent($(this).data('event')));
         
@@ -201,7 +185,6 @@ $(document).ready(function() {
         $('#editEventTitleInput').val(eventData.title);
         $('#editEventDescInput').val(eventData.description);
         
-        // Formatowanie daty dla inputa
         const d = new Date(eventData.event_date);
         d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
         const dateStr = d.toISOString().slice(0, 16);
@@ -210,7 +193,6 @@ $(document).ready(function() {
         editEventModal.show();
     });
 
-    // Zapis edycji WYDARZENIA
     $('#editEventForm').submit(function(e) {
         e.preventDefault();
         const eventId = $('#editEventId').val();
@@ -228,7 +210,7 @@ $(document).ready(function() {
             data: JSON.stringify(updateData),
             success: function() {
                 editEventModal.hide();
-                initProfile(); // Przeładuj listę
+                initProfile();
             },
             error: function(xhr) {
                 alert("Błąd zapisu: " + (xhr.responseJSON?.detail || "Error"));
@@ -236,7 +218,6 @@ $(document).ready(function() {
         });
     });
 
-    // Usuwanie WYDARZENIA
     $(document).on('click', '.delete-event-btn', function() {
         if(!confirm("Czy na pewno chcesz usunąć to wydarzenie?")) return;
         const eventId = $(this).data('id');
@@ -253,6 +234,5 @@ $(document).ready(function() {
         return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/\n/g, "<br>");
     }
 
-    // Start
     initProfile();
 });

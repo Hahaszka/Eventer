@@ -17,18 +17,15 @@ from models.user import User
 
 load_dotenv()
 
-# --- KONFIGURACJA Z PLIKU .ENV ---
 SECRET = os.environ.get("SECRET")
 GOOGLE_OAUTH_CLIENT_ID = os.environ.get("GOOGLE_OAUTH_CLIENT_ID")
 GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET")
 
 
-# --- 1. STRATEGIA TOKENÓW ---
 def get_jwt_strategy() -> JWTStrategy:
     return JWTStrategy(secret=SECRET, lifetime_seconds=3600)
 
 
-# --- 2. LOGOWANIE HASŁEM ---
 bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
 
 auth_backend_jwt = AuthenticationBackend(
@@ -37,8 +34,6 @@ auth_backend_jwt = AuthenticationBackend(
     get_strategy=get_jwt_strategy,
 )
 
-
-# --- 3. LOGOWANIE GOOGLE ---
 class GoogleRedirectTransport(CookieTransport):
     async def get_login_response(self, token: str) -> Response:
         response = RedirectResponse(url="/dashboard.html", status_code=302)
@@ -60,7 +55,6 @@ auth_backend_google = AuthenticationBackend(
 )
 
 
-# --- 4. GŁÓWNY OBIEKT FASTAPI-USERS ---
 fastapi_users = FastAPIUsers[User, uuid.UUID](
     get_user_manager,
     [auth_backend_jwt, auth_backend_google],
