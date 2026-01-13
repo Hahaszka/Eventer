@@ -36,7 +36,7 @@ def random_date(start_year=2026, end_year=2027):
     start = datetime(start_year, 1, 1)
     end = datetime(end_year, 1, 1)
     delta = end - start
-    random_seconds = random.randrange(delta.total_seconds())
+    random_seconds = random.randrange(int(delta.total_seconds()))
     return start + timedelta(seconds=random_seconds)
 
 def random_coords():
