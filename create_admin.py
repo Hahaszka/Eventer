@@ -1,28 +1,13 @@
 import asyncio
-import uuid
 from datetime import date
-
 from fastapi import HTTPException
-
 from auth.manager import UserManager
 from database.setup import get_async_session, get_user_db
 from models.user import User
 from schemas.user import UserCreate
 
-# --- DANE ADMINISTRATORA ---
-ADMIN_EMAIL = "michalski.szkolny@gmail.com"
-ADMIN_PASSWORD = "!EventerNaZaliczenieRobiony2321!"
-ADMIN_USERNAME = "admin_kacper"
-ADMIN_FIRST_NAME = "Kacper"
-ADMIN_LAST_NAME = "Michalski"
-ADMIN_DATE_OF_BIRTH = date(2000, 1, 1)
-
-
-async def create_admin_user():
-    """
-    Główna funkcja tworząca administratora.
-    """
-    print("Rozpoczynam tworzenie administratora...")
+async def create_admin_user(email, password, username, first_name, last_name):
+    print(f"--- INIT: Próba utworzenia administratora ({email}) ---")
 
     async_session_generator = get_async_session()
     session = await anext(async_session_generator)
@@ -34,14 +19,13 @@ async def create_admin_user():
 
     try:
         user_create_schema = UserCreate(
-            email=ADMIN_EMAIL,
-            password=ADMIN_PASSWORD,
-            username=ADMIN_USERNAME,
-            first_name=ADMIN_FIRST_NAME,
-            last_name=ADMIN_LAST_NAME,
-            date_of_birth=ADMIN_DATE_OF_BIRTH,
+            email=email,
+            password=password,
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            date_of_birth=date(2000, 1, 1),
         )
-
 
         await user_manager.create(
             user_create_schema,
@@ -50,18 +34,13 @@ async def create_admin_user():
             is_verified=True,
         )
         print("✅ Administrator został pomyślnie utworzony!")
-        print(f"   Email: {ADMIN_EMAIL}")
-        print(f"   Hasło: [UKRYTE]")
 
     except HTTPException as e:
         if "już istnieje" in e.detail:
-            print(f"⚠️  Błąd: Administrator z emailem '{ADMIN_EMAIL}' lub nazwą '{ADMIN_USERNAME}' już istnieje.")
-            print("   Nie podjęto żadnych działań.")
+            print(f"ℹ️  Info: Administrator {email} już istnieje. Pomijam.")
         else:
-            print(f"Wystąpił nieoczekiwany błąd: {e.detail}")
+            print(f"⚠️  Błąd przy tworzeniu admina: {e.detail}")
+    except Exception as e:
+        print(f"⚠️  Nieoczekiwany błąd admina: {e}")
     finally:
         await session.close()
-
-
-if __name__ == "__main__":
-    asyncio.run(create_admin_user())

@@ -1,18 +1,11 @@
 import asyncio
 import random
 from datetime import datetime, timedelta
-import uuid
 from sqlalchemy import select
-
 from database.setup import async_session_maker
 from models.user import User
 from models.event import Event, EventCategory
-from models.oauth import OAuthAccount 
 
-# === KONFIGURACJA ===
-ILOSC_WYDARZEN = 300
-
-# Granice Wielkopolski
 LAT_MIN = 51.45
 LAT_MAX = 53.60
 LNG_MIN = 15.75
@@ -35,7 +28,6 @@ TOPICS_MAP = {
 
 PREFIXES = ["Nocne", "Wielkie", "Sąsiedzkie", "Otwarte", "Charytatywne", "Turniejowe"]
 CITIES = ["Poznań", "Kalisz", "Konin", "Leszno", "Piła", "Gniezno", "Ostrów Wlkp."]
-
 DESCRIPTIONS = [
     "Zapraszamy wszystkich chętnych! Będzie super zabawa i darmowe przekąski.",
     "Wymagane własne obuwie i dobry humor. Zaczynamy punktualnie.",
@@ -56,27 +48,28 @@ def random_coords():
     lng = random.uniform(LNG_MIN, LNG_MAX)
     return lat, lng
 
-async def main():
-    print("--- ROZPOCZYNAM GENEROWANIE DANYCH TESTOWYCH ---")
+async def generate_random_events(amount: int):
+    print(f"--- INIT: Generowanie {amount} losowych wydarzeń ---")
     
     async with async_session_maker() as session:
+        result = await session.execute(select(Event))
+        existing_count = len(result.scalars().all())
+        if existing_count >= amount:
+             print(f"ℹ️  W bazie jest już {existing_count} wydarzeń. Pomijam generowanie.")
+             return
+
         result = await session.execute(select(User))
         user = result.scalars().first()
         
         if not user:
-            print("!!! BŁĄD: W bazie nie ma żadnego użytkownika !!!")
-            print("Zarejestruj najpierw konto przez stronę.")
+            print("⚠️  Błąd: Brak użytkowników w bazie. Najpierw stwórz admina!")
             return
-
-        print(f"Znaleziono użytkownika: {user.email} (ID: {user.id})")
-        print(f"Tworzę {ILOSC_WYDARZEN} wydarzeń...")
 
         events_list = []
         topic_keys = list(TOPICS_MAP.keys())
 
-        for i in range(ILOSC_WYDARZEN):
+        for i in range(amount):
             lat, lng = random_coords()
-            
             chosen_topic = random.choice(topic_keys)
             category = TOPICS_MAP[chosen_topic]
             
@@ -84,13 +77,11 @@ async def main():
             if random.random() > 0.7:
                 title += f" - {random.choice(CITIES)}"
             
-            event_date = random_date()
-            
             new_event = Event(
                 title=title,
                 description=random.choice(DESCRIPTIONS),
                 category=category.value,
-                event_date=event_date,
+                event_date=random_date(),
                 latitude=lat,
                 longitude=lng,
                 is_deleted=False,
@@ -100,8 +91,4 @@ async def main():
         
         session.add_all(events_list)
         await session.commit()
-        
-        print("--- SUKCES! DODANO WYDARZENIA Z KATEGORIAMI ---")
-
-if __name__ == "__main__":
-    asyncio.run(main())
+        print(f"✅ Dodano {len(events_list)} nowych wydarzeń.")

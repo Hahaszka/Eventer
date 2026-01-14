@@ -1,0 +1,11 @@
+setup:
+  create_admin: true
+  generate_dummy_data: true
+  dummy_data_count: 400
+
+admin:
+  email: "admin@eventer.pl"
+  password: "SuperSecretPassword123!"
+  username: "Administrator"
+  first_name: "Admin"
+  last_name: "Systemowy"

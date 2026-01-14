@@ -1,7 +1,6 @@
 import os
-import uuid
+import yaml
 from contextlib import asynccontextmanager
-
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, status, Depends
 from fastapi.responses import RedirectResponse, JSONResponse, FileResponse
@@ -21,16 +20,42 @@ from database.setup import create_db_and_tables
 from routers import users as users_router
 from routers import admin as admin_router 
 from routers import events as events_router
+from create_admin import create_admin_user
+from rdg import generate_random_events
 
-print("--- 1. main.py: Start importu modułów ---")
 load_dotenv()
-
 
 # --- LIFESPAN ---
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("--- LIFESPAN: Start aplikacji ---")
+    
     await create_db_and_tables()
+    
+    if os.path.exists("config.yaml"):
+        try:
+            with open("config.yaml", "r") as f:
+                config = yaml.safe_load(f)
+            
+            if config.get("setup", {}).get("create_admin", False):
+                admin_data = config.get("admin", {})
+                await create_admin_user(
+                    email=admin_data.get("email"),
+                    password=admin_data.get("password"),
+                    username=admin_data.get("username"),
+                    first_name=admin_data.get("first_name"),
+                    last_name=admin_data.get("last_name")
+                )
+
+            if config.get("setup", {}).get("generate_dummy_data", False):
+                count = config.get("setup", {}).get("dummy_data_count", 50)
+                await generate_random_events(count)
+                
+        except Exception as e:
+            print(f"⚠️  Błąd podczas przetwarzania config.yaml: {e}")
+    else:
+        print("ℹ️  Brak pliku config.yaml - pomijam inicjalizację danych.")
+
     yield
     print("--- LIFESPAN: Zamykanie aplikacji ---")
 
@@ -49,8 +74,6 @@ async def custom_http_exception_handler(request: Request, exc: StarletteHTTPExce
     
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
 
-
-
 @app.post("/auth/logout")
 async def logout():
     response = JSONResponse(content={"message": "Logged out successfully"})
@@ -60,18 +83,17 @@ async def logout():
 current_superuser = fastapi_users.current_user(active=True, superuser=True)
 
 @app.get("/admin")
-async def admin_panel(user=Depends(current_superuser)):
+async def admin_panel():
     return FileResponse("secure/admin.html")
 
 @app.get("/admin/js/admin.js")
-async def get_admin_js(user=Depends(current_superuser)):
+async def get_admin_js():
     return FileResponse("secure/js/admin.js", media_type="application/javascript")
 
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     return FileResponse("public/img/logo.png")
 
-# --- ROUTERY AUTORYZACJI ---
 app.include_router(
     fastapi_users.get_auth_router(auth_backend_jwt), prefix="/auth/jwt", tags=["Auth"]
 )
@@ -99,13 +121,9 @@ app.include_router(
     tags=["Auth"],
 )
 
-# --- ROUTERY API ---
 app.include_router(users_router.router, prefix="/users", tags=["Users"])
 app.include_router(admin_router.router, prefix="/admin", tags=["Admin API"])
-
 app.include_router(events_router.router, prefix="/events", tags=["Events"])
 
 if os.path.isdir("public"):
     app.mount("/", StaticFiles(directory="public", html=True), name="public")
-else:
-    print("!!! UWAGA: Folder 'public' nie istnieje !!!")
