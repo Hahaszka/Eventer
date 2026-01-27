@@ -105,9 +105,13 @@ async def create_event(
     event_in: EventCreate,
     user: User = Depends(current_user),
     session: AsyncSession = Depends(get_async_session)
-):
+):  
+    event_data = event_in.dict()
+    if event_data.get("event_date") and event_data["event_date"].tzinfo:
+        event_data["event_date"] = event_data["event_date"].replace(tzinfo=None)
+
     new_event = Event(
-        **event_in.dict(),
+        **event_data,
         creator_id=user.id,
         is_deleted=False
     )
@@ -137,6 +141,9 @@ async def update_event(
         raise HTTPException(status_code=403, detail="Brak uprawnień do edycji")
 
     update_data = event_update.dict(exclude_unset=True)
+    if "event_date" in update_data and update_data["event_date"] and update_data["event_date"].tzinfo:
+        update_data["event_date"] = update_data["event_date"].replace(tzinfo=None)
+
     for key, value in update_data.items():
         setattr(event, key, value)
 
